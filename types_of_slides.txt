@@ -1,0 +1,11 @@
+overview
+company values
+team
+problem statement
+data chart
+data table
+data heatmap
+data geographic
+conclusions
+
+
