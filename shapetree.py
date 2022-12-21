@@ -68,6 +68,7 @@ class _BaseShapes(ParentedElementProxy):
         super(_BaseShapes, self).__init__(spTree, parent)
         self._spTree = spTree
         self._cached_max_shape_id = None
+        self._max_pic_shape_id = 0
 
     def __getitem__(self, idx):
         """
@@ -212,7 +213,8 @@ class _BaseShapes(ParentedElementProxy):
         assigned id="1".
         """
         # ---presence of cached-max-shape-id indicates turbo mode is on---
-        return  1
+        self._max_pic_shape_id += 1
+        return self._max_pic_shape_id
 
     @property
     def _next_shape_id(self):
@@ -642,7 +644,7 @@ class MasterShapes(_BaseShapes):
     """
     
     def test(self):
-       print('worked')
+       print('installed.')
    
     def add_picture(self, image_file, left, top, width=None, height=None):
        """Add picture shape displaying image in *image_file*.
@@ -660,6 +662,18 @@ class MasterShapes(_BaseShapes):
        self._recalculate_extents()
        return self._shape_factory(pic)
 
+
+    def add_connector(self, connector_type, begin_x, begin_y, end_x, end_y):
+        """Add a newly created connector shape to the end of this shape tree.
+
+        *connector_type* is a member of the :ref:`MsoConnectorType`
+        enumeration and the end-point values are specified as EMU values. The
+        returned connector is of type *connector_type* and has begin and end
+        points as specified.
+        """
+        cxnSp = self._add_cxnSp(connector_type, begin_x, begin_y, end_x, end_y)
+        self._recalculate_extents()
+        return self._shape_factory(cxnSp)
 
     def add_shape(self, autoshape_type_id, left, top, width, height):
         """Return new |Shape| object appended to this shape tree.
@@ -711,7 +725,7 @@ class MasterShapes(_BaseShapes):
         `p:sp` element is of *autoshape_type* at position (*x*, *y*) and of
         size (*cx*, *cy*).
         """
-        id_ = self._next_shape_id
+        id_ = self._next_pic_shape_id
         name = "%s %d" % (autoshape_type.basename, id_ - 1)
         sp = self._spTree.add_autoshape(id_, name, autoshape_type.prst, x, y, cx, cy)
         return sp
@@ -731,6 +745,23 @@ class MasterShapes(_BaseShapes):
         pic = self._spTree.add_pic(id_, name, desc, rId, x, y, scaled_cx, scaled_cy)
         return pic
 
+    def _add_cxnSp(self, connector_type, begin_x, begin_y, end_x, end_y):
+        """Return a newly-added `p:cxnSp` element as specified.
+
+        The `p:cxnSp` element is for a connector of *connector_type*
+        beginning at (*begin_x*, *begin_y*) and extending to
+        (*end_x*, *end_y*).
+        """
+        id_ = self._next_pic_shape_id
+        name = "Connector %d" % (id_ - 1)
+
+        flipH, flipV = begin_x > end_x, begin_y > end_y
+        x, y = min(begin_x, end_x), min(begin_y, end_y)
+        cx, cy = abs(end_x - begin_x), abs(end_y - begin_y)
+
+        return self._element.add_cxnSp(
+            id_, name, connector_type, x, y, cx, cy, flipH, flipV
+        )
 
 class NotesSlideShapes(_BaseShapes):
     """
