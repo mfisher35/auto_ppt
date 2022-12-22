@@ -11,6 +11,7 @@ slide_master = prs.slide_master
 
 
 helpers.add_logo_master_bottom_right(prs,'logo.png')
+helpers.add_title_logo(prs,'logo.png')
 #shapes = slide_master.shapes
 #print(dir(slide_master.shapes))
 #slide_master.shapes.test()
