@@ -4,10 +4,10 @@ import FileUploader from './components/FileUploader';
 
 const style = {
     backgroundColor: '#282c34',
+    paddingTop: '40px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center',
     color: 'white',
     height: '100vh',
     width: '100vw',
