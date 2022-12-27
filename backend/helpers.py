@@ -5,7 +5,8 @@ from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
 from pptx.dml.color import RGBColor
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
-from PIL import Image
+from PIL import Image, ImageEnhance
+
 
 def add_heading_line_breaks(prs):
   slide_master = prs.slide_master
@@ -23,16 +24,24 @@ def add_heading_line_breaks(prs):
       line.line.fill.fore_color.rgb = RGBColor.from_string("FF0000")
 
 def add_title_logo(prs,pic_path):
+  im = Image.open(pic_path)
+  pic_path = pic_path.replace(".",'-title.')
+  enhancer = ImageEnhance.Sharpness(im)
+  im2 = enhancer.enhance(0.01)
+  enhancer = ImageEnhance.Contrast(im)
+  im2 = enhancer.enhance(0.01)
+  enhancer = ImageEnhance.Brightness(im)
+  im2 = enhancer.enhance(3)
+  im2.save(pic_path);
   shape = prs.slides[0].shapes.add_picture(pic_path, Inches(-2.72), Inches(-0.78), None, None)
   cursor_sp = prs.slides[0].shapes[0]._element
   cursor_sp.addprevious(shape._element)
-  res_width, res_height =  _get_proportional_width_height(shape.width,shape.height,9,9,method="max")
+  res_width, res_height =  _title_logo_proportional_width_height(shape.width,shape.height)
   shape.width = res_width
   shape.height = res_height
   shape.left = Inches(5) - shape.width 
-  shape.top = Inches(0)#Inches(3.13) - int(shape.height*0.75)
+  shape.top = Inches(0)
  
-  print(dir(shape.image))
 
 def add_logo_master_bottom_right(prs,pic_path):
   slide_master = prs.slide_master
@@ -94,3 +103,11 @@ def _get_proportional_width_height(width,height,target_width=0.25,target_height=
     res_height = Inches(target_height)
     res_width = int(ratio*Inches(target_width))
   return(res_width,res_height)
+
+def _title_logo_proportional_width_height(width,height,slide_width=10,slide_height=7.5):
+  slide_height = Inches(slide_height)
+  slide_width = Inches(slide_width)
+  ratio = slide_height/height
+  res_height = int(ratio * height)
+  res_width = int(ratio * width)
+  return (res_width,res_height)
