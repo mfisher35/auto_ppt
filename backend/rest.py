@@ -17,7 +17,7 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
-upload_path = "/Users/madfish/auto_ppt/backend/upload"
+upload_path = os.path.join(os.getcwd(),"upload")
 
 def token_required(f):
     @wraps(f)
