@@ -1,4 +1,4 @@
-const apiHost = "http://127.0.0.1:5005"
+const apiHost = "https://www.daltonlogi.org/rest"
 
 export const handleSubmission = (pptxFile,logoFile) => {
   const formData = new FormData();
